@@ -108,4 +108,35 @@ Describe 'Photo.Shell.Tests' {
             { Resize-Image -Image $img -Ratio 1 } | Should -Throw
         }
     }
+
+    Context "Compress-Image" {
+        It "<Format> with <Compression> compression is efficient➡ <Efficient>" -TestCases @(
+            @{ Format = [System.Drawing.Imaging.ImageFormat]::Png; Compression = [System.Drawing.Imaging.ImageFormat]::Png; Efficient = $true }
+            @{ Format = [System.Drawing.Imaging.ImageFormat]::Jpeg; Compression = [System.Drawing.Imaging.ImageFormat]::Jpeg; Efficient = $true }
+            @{ Format = [System.Drawing.Imaging.ImageFormat]::Png; Compression = [System.Drawing.Imaging.ImageFormat]::Jpeg; Efficient = $false } # not always - depending on image
+        ) {
+            param ($Format, $Compression, $Efficient)
+
+            $img_before = Get-TestImage -Format $Format
+            $img_after = Compress-Image $img_before -Format $Compression -Compression 10L
+            $size_after = $img_after.ToArray().Length
+            $size_before = $img_before.Length
+            $size_after -lt $size_before | Should -Be $Efficient
+        }
+
+        It "should accept" {
+            $type = [System.Drawing.Imaging.ImageFormat]::Png
+            $img_before = Get-TestImage -Format $type
+
+            { Compress-Image $img_before -Format $type -Compression 10L } | Should -Not -Throw
+            { Compress-Image $img_before -Format $type -Compression 10L } |  Should -Not -BeNullOrEmpty
+        }
+
+        It "shouldn't accept" {
+            $type = [System.Drawing.Imaging.ImageFormat]::Png
+            $img_before = Get-TestImage -Format $type
+            $img_before = Convert-BytesToImage $img_before
+            { Compress-Image $img_before -Format $type -Compression 10L } | Should -Throw -ExceptionType ([System.ArgumentException])
+        }
+    }
 }
