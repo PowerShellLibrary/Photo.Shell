@@ -14,7 +14,7 @@ function Get-TestImage {
 
     $result = [System.IO.MemoryStream]::new()
     $bitmap.Save($result, $Format)
-    $result.ToArray()
+    Write-Output $result.ToArray() -NoEnumerate
 }
 
 function Convert-BytesToImage {
@@ -55,7 +55,6 @@ Describe 'Photo.Shell.Tests' {
     Context "Resize-Image" {
         $testImage = Get-TestImage
 
-
         It "should resize and keep ratio - smaller" {
             # 1000 x 800
             $img_before = Convert-BytesToImage $testImage
@@ -92,6 +91,21 @@ Describe 'Photo.Shell.Tests' {
 
             $img_after.Width | Should -BeExactly 200
             $img_after.Height | Should -BeExactly 160
+        }
+
+        It "should accept" {
+            $stream = [System.IO.MemoryStream]::new($testImage)
+            { Resize-Image -Image $stream -Ratio 1 } | Should -Not -Throw
+            { Resize-Image -Image $stream -Ratio 1 } |  Should -Not -BeNullOrEmpty
+
+            { Resize-Image -Image $testImage -Ratio 1 } | Should -Not -Throw
+            { Resize-Image -Image $testImage -Ratio 1 } |  Should -Not -BeNullOrEmpty
+        }
+
+        It "shouldn't accept" {
+            $stream = [System.IO.MemoryStream]::new($testImage)
+            $img = [System.Drawing.Image]::FromStream($stream)
+            { Resize-Image -Image $img -Ratio 1 } | Should -Throw
         }
     }
 }

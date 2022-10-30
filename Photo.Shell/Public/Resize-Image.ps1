@@ -2,7 +2,7 @@ function Resize-Image {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [byte[]]$Image,
+        $Image,
         [Parameter(Mandatory = $false, ParameterSetName = "Sizes")]
         [switch]$ProportionalResize = $false,
         [Parameter(Mandatory = $true, ParameterSetName = "Sizes")]
@@ -20,7 +20,13 @@ function Resize-Image {
     process {
         Write-Verbose "Cmdlet Resize-Image - Process"
 
-        $stream = [System.IO.MemoryStream]::new($Image)
+        if ($Image.PSTypeNames -contains [System.Byte[]].ToString()) {
+            $stream = [System.IO.MemoryStream]::new($Image)
+        }
+        else {
+            $stream = $Image
+        }
+
         $img = [System.Drawing.Image]::FromStream($stream)
 
         if ($PSCmdlet.ParameterSetName -eq 'Sizes') {
