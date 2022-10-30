@@ -17,6 +17,16 @@ function Get-TestImage {
     $result.ToArray()
 }
 
+function Convert-BytesToImage {
+    param (
+        [byte[]]$testImage
+    )
+
+    $stream = [System.IO.MemoryStream]::new($testImage)
+    [System.Drawing.Image]::FromStream($stream)
+
+}
+
 Describe 'Photo.Shell.Tests' {
     Context "Get-ImageCodecInfo" {
         $testImage = Get-TestImage
@@ -39,6 +49,49 @@ Describe 'Photo.Shell.Tests' {
             param ($Format, $Expected)
             $img = Get-TestImage -Format $Format
             Get-ImageCodecInfo $img | Select-Object -ExpandProperty MimeType  | Should -BeExactly $Expected
+        }
+    }
+
+    Context "Resize-Image" {
+        $testImage = Get-TestImage
+
+
+        It "should resize and keep ratio - smaller" {
+            # 1000 x 800
+            $img_before = Convert-BytesToImage $testImage
+
+            $img_after = Resize-Image -Image $testImage -Ratio 0.1 #10%
+            $img_after = [System.Drawing.Image]::FromStream($img_after)
+
+            $img_after.Width | Should -BeExactly ($img_before.Width * 0.1)
+            $img_after.Height | Should -BeExactly ($img_before.Height * 0.1)
+        }
+
+        It "should resize and keep ratio - bigger" {
+            # 1000 x 800
+            $img_before = Convert-BytesToImage $testImage
+
+            $img_after = Resize-Image -Image $testImage -Ratio 1.2 #120%
+            $img_after = [System.Drawing.Image]::FromStream($img_after)
+
+            $img_after.Width | Should -BeExactly ($img_before.Width * 1.2)
+            $img_after.Height | Should -BeExactly ($img_before.Height * 1.2)
+        }
+
+        It "should resize to a given size" {
+            $img_after = Resize-Image -Image $testImage -Width 200 -Height 200
+            $img_after = [System.Drawing.Image]::FromStream($img_after)
+
+            $img_after.Width | Should -BeExactly 200
+            $img_after.Height | Should -BeExactly 200
+        }
+
+        It "should resize to a given size with ratio" {
+            $img_after = Resize-Image -Image $testImage -Width 200 -Height 200 -ProportionalResize
+            $img_after = [System.Drawing.Image]::FromStream($img_after)
+
+            $img_after.Width | Should -BeExactly 200
+            $img_after.Height | Should -BeExactly 160
         }
     }
 }

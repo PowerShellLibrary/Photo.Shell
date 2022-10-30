@@ -1,3 +1,5 @@
+# Table of file signatures (aka "magic numbers")
+# https://www.garykessler.net/library/file_sigs.html
 function Get-ImageCodecInfo {
     [CmdletBinding()]
     param (
