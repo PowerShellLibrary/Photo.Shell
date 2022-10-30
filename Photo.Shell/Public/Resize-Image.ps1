@@ -20,7 +20,14 @@ function Resize-Image {
     process {
         Write-Verbose "Cmdlet Resize-Image - Process"
 
-        if ($Image.PSTypeNames -contains [System.Byte[]].ToString()) {
+        $isByte = Test-ByteArrayType $Image
+        $isStream = Test-StreamType $Image
+
+        if (!$isByte -and !$isStream ) {
+            throw [System.ArgumentException]::new("Invalid input. Accepted types are: [System.IO.Stream] and [System.Byte[]]")
+        }
+
+        if ($isByte) {
             $stream = [System.IO.MemoryStream]::new($Image)
         }
         else {

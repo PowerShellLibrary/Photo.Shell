@@ -50,6 +50,10 @@ Describe 'Photo.Shell.Tests' {
             $img = Get-TestImage -Format $Format
             Get-ImageCodecInfo $img | Select-Object -ExpandProperty MimeType  | Should -BeExactly $Expected
         }
+
+        It "shouldn't accept" {
+            { Get-ImageCodecInfo $false } | Should -Throw -ExceptionType ([System.ArgumentException])
+        }
     }
 
     Context "Resize-Image" {
@@ -103,9 +107,7 @@ Describe 'Photo.Shell.Tests' {
         }
 
         It "shouldn't accept" {
-            $stream = [System.IO.MemoryStream]::new($testImage)
-            $img = [System.Drawing.Image]::FromStream($stream)
-            { Resize-Image -Image $img -Ratio 1 } | Should -Throw
+            { Resize-Image -Image $false -Ratio 1 } | Should -Throw -ExceptionType ([System.ArgumentException])
         }
     }
 
@@ -133,10 +135,7 @@ Describe 'Photo.Shell.Tests' {
         }
 
         It "shouldn't accept" {
-            $type = [System.Drawing.Imaging.ImageFormat]::Png
-            $img_before = Get-TestImage -Format $type
-            $img_before = Convert-BytesToImage $img_before
-            { Compress-Image $img_before -Format $type -Compression 10L } | Should -Throw -ExceptionType ([System.ArgumentException])
+            { Compress-Image $false -Format $type -Compression 10L } | Should -Throw -ExceptionType ([System.ArgumentException])
         }
     }
 }

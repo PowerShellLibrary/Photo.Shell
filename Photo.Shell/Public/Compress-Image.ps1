@@ -15,8 +15,8 @@ function Compress-Image {
 
     process {
         Write-Verbose "Cmdlet Compress-Image - Process"
-        $isByte = $Image.PSTypeNames -contains [System.Byte[]].ToString()
-        $isStream = $Image.PSTypeNames -contains [System.IO.Stream]
+        $isByte = Test-ByteArrayType $Image
+        $isStream = Test-StreamType $Image
 
         if (!$isByte -and !$isStream ) {
             throw [System.ArgumentException]::new("Invalid input. Accepted types are: [System.IO.Stream] and [System.Byte[]]")

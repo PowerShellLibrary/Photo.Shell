@@ -3,7 +3,6 @@
 function Get-ImageCodecInfo {
     [CmdletBinding()]
     param (
-        # [byte[]] or [System.IO.Stream]
         [Parameter(Mandatory = $true, Position = 0 )]
         $Image
     )
@@ -15,7 +14,14 @@ function Get-ImageCodecInfo {
     process {
         Write-Verbose "Cmdlet Get-ImageCodecInfo - Process"
 
-        if ($Image.PSTypeNames -contains [System.IO.Stream]) {
+        $isByte = Test-ByteArrayType $Image
+        $isStream = Test-StreamType $Image
+
+        if (!$isByte -and !$isStream ) {
+            throw [System.ArgumentException]::new("Invalid input. Accepted types are: [System.IO.Stream] and [System.Byte[]]")
+        }
+
+        if ($isStream) {
             $Image = $Image.ToArray()
         }
 
