@@ -45,7 +45,6 @@ function Compress-Image {
         }
         $img = [System.Drawing.Image]::FromStream($stream)
         $img.Save($result, $codec, $parameters)
-        $stream.Dispose()
         $result
     }
 

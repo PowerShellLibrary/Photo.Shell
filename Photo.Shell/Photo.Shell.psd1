@@ -1,7 +1,7 @@
 
 @{
     RootModule        = 'Photo.Shell.psm1'
-    ModuleVersion     = '1.0.0'
+    ModuleVersion     = '1.0.1'
     GUID              = '7c120cb8-77c1-47aa-a17d-51ce26a679ae'
     Author            = 'Alan Plocieniak'
     CompanyName       = 'Alan Plocieniak'

@@ -50,7 +50,6 @@ function Resize-Image {
 
         $graphics = [System.Drawing.Graphics]::FromImage($destImage)
         $graphics.DrawImage($img, 0, 0, $newWidth, $newHeight)
-        $graphics.Dispose()
 
         $stream2 = [System.IO.MemoryStream]::new()
         $destImage.Save($stream2, [System.Drawing.Imaging.ImageFormat]::Png)
